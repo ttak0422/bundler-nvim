@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
       url = "github:edolstra/flake-compat";
       flake = false;
@@ -59,8 +58,30 @@
               ...
             }:
             let
-              inherit (import ./nix/bundler.nix { inherit system pkgs crane; }) bundler toolchain;
-              inherit (import ./nix/bundler-nvim.nix { inherit pkgs; }) bundler-nvim;
+              inherit (pkgs.lib) optionals;
+              inherit (pkgs.stdenv) isDarwin;
+              toolchain = pkgs.fenix.fromToolchainFile {
+                file = ./bundler/rust-toolchain.toml;
+                sha256 = "sha256-opUgs6ckUQCyDxcB9Wy51pqhd0MPGHUVbwRKKPGiwZU=";
+              };
+              craneLib = (crane.mkLib pkgs).overrideToolchain toolchain;
+              bundler = with craneLib; rec {
+                commonArgs = {
+                  src = cleanCargoSource (path ./bundler);
+                  buildInputs = optionals isDarwin (
+                    with pkgs;
+                    [
+                      libiconv
+                      darwin.apple_sdk.frameworks.Security
+                    ]
+                  );
+                  nativeBuildgInputs = [ ];
+                };
+                artifacts = buildDepsOnly (commonArgs // { pname = "bundler-deps"; });
+                clippy = cargoClippy (commonArgs // { cargoArtifacts = artifacts; });
+                nextest = cargoNextest (commonArgs // { cargoArtifacts = artifacts; });
+                package = buildPackage (commonArgs // { cargoArtifacts = artifacts; });
+              };
             in
             {
               _module.args.pkgs = import inputs.nixpkgs {
@@ -72,7 +93,6 @@
               };
               packages = {
                 bundler = bundler.package;
-                bundler-nvim = bundler-nvim.package;
                 mdbook =
                   let
                     inherit (pkgs) nix-filter;
