@@ -345,14 +345,13 @@
               ${bundler}/bin/bundler ${payload} $out
             '';
           };
-          # `;` needed to avoid syntax error
           file = pkgs.writeText "file.lua" ''
+            (function()
             ${extraConfig}
-            ;${
-              replaceStrings [ "REPLACED_BY_NIX" ] [
-                "{root='${configRoot}',log_level=3}"
-              ] (readFile ./runtime.lua)
-            }
+            end)();
+            ${replaceStrings [ "REPLACED_BY_NIX" ] [
+              "{root='${configRoot}',log_level=3}"
+            ] (readFile ./runtime.lua)}
           '';
           entrypoint =
             let
