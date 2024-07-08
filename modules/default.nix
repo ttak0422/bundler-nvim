@@ -30,7 +30,7 @@
             default = "";
           };
           args = mkOption {
-            type = attrsOf str;
+            type = attrsOf (either str path);
             default = { };
           };
         };
