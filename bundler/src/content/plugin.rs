@@ -60,23 +60,22 @@ impl From<payload::plugin::LazyComponent> for Vec<PluginConfig> {
             is_opt: true,
             is_denops_client: value.use_denops,
         };
-        let (depend_packages, mut depend_components): (Vec<String>, Vec<PluginConfig>) = value
+
+        let normalized_depends = value
             .depends
             .into_iter()
-            .fold((vec![], vec![]), |(mut pkgs, mut cmps), p| {
-                match p {
-                    payload::plugin::lazy::PackageOrComponent::Package(p) => pkgs.push(p),
-                    payload::plugin::lazy::PackageOrComponent::Component(c) => {
-                        let mut components = Vec::<PluginConfig>::from(c);
-                        cmps.append(&mut components);
-                    }
+            .map(|p| match p {
+                payload::plugin::lazy::PackageOrComponent::Package(p) => {
+                    payload::plugin::lazy::Component::from(p)
                 }
-                (pkgs, cmps)
-            });
-        let mut depends = depend_packages;
-        for cmp in depend_components.iter() {
-            depends.push(cmp.id.clone());
-        }
+                payload::plugin::lazy::PackageOrComponent::Component(c) => c,
+            })
+            .collect::<Vec<_>>();
+        let mut depend_components = normalized_depends
+            .into_iter()
+            .flat_map(Vec::<PluginConfig>::from)
+            .collect::<Vec<_>>();
+        let depends = depend_components.iter().map(|c| c.id.clone()).collect();
         configs.push(PluginConfig { depends, ..config });
         configs.append(&mut depend_components);
         configs

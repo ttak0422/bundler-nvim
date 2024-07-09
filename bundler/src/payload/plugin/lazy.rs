@@ -33,3 +33,12 @@ pub struct Component {
     pub hooks: Hook,
     pub use_denops: bool,
 }
+
+impl From<String> for Component {
+    fn from(package: String) -> Self {
+        Component {
+            package: Some(package),
+            ..Default::default()
+        }
+    }
+}
