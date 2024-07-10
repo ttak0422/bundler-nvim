@@ -349,9 +349,9 @@
             (function()
             ${extraConfig}
             end)();
-            ${replaceStrings [ "REPLACED_BY_NIX" ] [
-              "{root='${configRoot}',log_level=3}"
-            ] (readFile ./runtime.lua)}
+            local R="${configRoot}"
+            vim.opt.runtimepath:append(R .. "/after");
+            ${replaceStrings [ "REPLACED_BY_NIX" ] [ "{root=R,log_level=3}" ] (readFile ./runtime.lua)}
           '';
           entrypoint =
             let
