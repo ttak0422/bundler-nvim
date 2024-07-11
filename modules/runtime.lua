@@ -110,7 +110,9 @@
 		end
 	end
 
-	package.preload["bundler"] = M
+	package.preload["bundler"] = function()
+		return M
+	end
 
 	-- register autocmds
 	for _, ev in ipairs(dofile(opt.root .. "/event_keys")) do

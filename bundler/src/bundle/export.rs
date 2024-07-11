@@ -125,7 +125,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
             "
             if not vim.g.bundler_ft_plugins_{} then
                 vim.g.bundler_ft_plugins_{} = true
-                require('bundler').load_plugins({})
+                require('bundler'):load_plugins({})
             end
             ",
             &ft,
