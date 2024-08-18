@@ -25,6 +25,20 @@ fn create_or_open_file(path: impl AsRef<Path>) -> Result<File> {
         .context("failed to create or open file")
 }
 
+fn create_or_open_file_append(path: impl AsRef<Path>) -> Result<File> {
+    if let Some(parent_dir) = path.as_ref().parent() {
+        fs::create_dir_all(parent_dir)?;
+    }
+    OpenOptions::new()
+        .create(true)
+        .truncate(false)
+        .append(true)
+        .write(true)
+        .read(true)
+        .open(&path)
+        .context("failed to create or open file")
+}
+
 fn export_plugin_config(root: &str, cfg: PluginConfig) -> Result<()> {
     let id = cfg.id.to_string();
 
@@ -169,7 +183,7 @@ fn export_after_config(root: &str, after: HashMap<String, HashMap<String, String
                 (key + ".lua").as_ref(),
             ]
             .join("/");
-            let mut file = create_or_open_file(path)?;
+            let mut file = create_or_open_file_append(path)?;
             write!(file, "{}", value)?;
         }
     }
