@@ -345,13 +345,24 @@
               ${bundler}/bin/bundler ${payload} $out
             '';
           };
+          logLevel =
+            if cfg.logLevel == "debug" then
+              "0"
+            else if cfg.logLevel == "info" then
+              "1"
+            else if cfg.logLevel == "warn" then
+              "2"
+            else
+              "3";
           file = pkgs.writeText "file.lua" ''
             (function()
             ${extraConfig}
             end)();
             local R="${configRoot}"
             vim.opt.runtimepath:append(R .. "/after");
-            ${replaceStrings [ "REPLACED_BY_NIX" ] [ "{root=R,log_level=3}" ] (readFile ./runtime.lua)}
+            ${replaceStrings [ "REPLACED_BY_NIX" ] [
+              "{root=R,log_level=${logLevel}}"
+            ] (readFile ./runtime.lua)}
           '';
           entrypoint =
             let
