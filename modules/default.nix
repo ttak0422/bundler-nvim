@@ -5,7 +5,7 @@
     { pkgs, ... }:
     with lib.types;
     let
-      inherit (lib) mkOption;
+      inherit (lib) mkOption mkEnableOption;
       /**
         # Type
 
@@ -165,6 +165,9 @@
           description = "log level";
           default = "warn";
         };
+        withRuby = mkEnableOption "enable Ruby provider. (default = false)";
+        withPython3 = mkEnableOption "enable Python 3 provider. (default = false)";
+        withNodeJs = mkEnableOption "enable Node provider. (default = false)";
         after = mkOption {
           type = attrsOf (attrsOf config);
           description = "for preferences to overrule or add to the distributed defaults or system-wide settings.";
@@ -393,6 +396,7 @@
             };
 
           neovimConfig = pkgs.neovimUtils.makeNeovimConfig {
+            inherit (cfg) withRuby withPython3 withNodeJs;
             plugins = eagerPluginPackages ++ lazyPluginPackages;
             wrapRc = true;
           };
