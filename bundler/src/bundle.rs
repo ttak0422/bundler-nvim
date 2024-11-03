@@ -109,6 +109,8 @@ pub fn bundle(root: &str, content: content::Content) -> Result<()> {
         }
     }
 
+    load_config.rtp = rtp;
+
     export::export(
         root,
         Config {
