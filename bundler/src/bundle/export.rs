@@ -155,7 +155,14 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     write!(startup_config_keys_file, "return {}", startup_config_keys)?;
 
     // denops
-    let denops_keys = cfg.denops_clients.into_lua();
+    let denops_keys = cfg
+        .denops_clients
+        .into_iter()
+        .fold(HashMap::new(), |mut acc, k| {
+            acc.insert(k, true);
+            acc
+        })
+        .into_lua();
     let denops_keys_path = [root, constant::file::DENOPS_KEYS].join("/");
     let mut denops_keys_file = create_or_open_file(denops_keys_path)?;
     write!(denops_keys_file, "return {}", denops_keys)?;

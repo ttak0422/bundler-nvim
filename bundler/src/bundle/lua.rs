@@ -17,9 +17,10 @@ where
     }
 }
 
-impl<T> LuaPortable for HashMap<T, T>
+impl<T, U> LuaPortable for HashMap<T, U>
 where
     T: Display,
+    U: Display,
 {
     fn into_lua(self) -> String {
         let items = self
