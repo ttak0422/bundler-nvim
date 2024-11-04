@@ -46,6 +46,7 @@ fn export_plugin_config(root: &str, cfg: PluginConfig) -> Result<()> {
     let mut packages_file = create_or_open_file(packages_path)?;
     write!(packages_file, "return {}", {
         let mut ps = cfg.packages;
+        ps.sort();
         ps.dedup();
         ps.into_lua()
     })?;
@@ -76,6 +77,7 @@ fn export_plugin_config(root: &str, cfg: PluginConfig) -> Result<()> {
     let mut depends_file = create_or_open_file(depends_path)?;
     write!(depends_file, "return {}", {
         let mut ps = cfg.depends;
+        ps.sort();
         ps.dedup();
         ps.into_lua()
     })?;
@@ -90,6 +92,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     let mut module_keys_file = create_or_open_file(module_keys_path)?;
     write!(module_keys_file, "return {}", module_keys.into_lua())?;
     for (m, mut ps) in cfg.on_modules {
+        ps.sort();
         ps.dedup();
         let module_path = [root, constant::dir::MODULES, m.as_ref()].join("/");
         let mut module_file = create_or_open_file(module_path)?;
@@ -99,6 +102,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     // events
     let event_keys = {
         let mut ks = cfg.on_events.keys().collect::<Vec<_>>();
+        ks.sort();
         ks.dedup();
         ks.into_lua()
     };
@@ -106,6 +110,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     let mut event_keys_file = create_or_open_file(event_keys_path)?;
     write!(event_keys_file, "return {}", event_keys)?;
     for (ev, mut ps) in cfg.on_events {
+        ps.sort();
         ps.dedup();
         let event_path = [root, constant::dir::EVENTS, ev.as_ref()].join("/");
         let mut event_file = create_or_open_file(event_path)?;
@@ -115,6 +120,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     // user events
     let user_event_keys = {
         let mut ks = cfg.on_userevents.keys().collect::<Vec<_>>();
+        ks.sort();
         ks.dedup();
         ks.into_lua()
     };
@@ -122,6 +128,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     let mut user_event_keys_file = create_or_open_file(user_event_keys_path)?;
     write!(user_event_keys_file, "return {}", user_event_keys)?;
     for (ev, mut ps) in cfg.on_userevents {
+        ps.sort();
         ps.dedup();
         let user_event_path = [root, constant::dir::USER_EVENTS, ev.as_ref()].join("/");
         let mut user_event_file = create_or_open_file(user_event_path)?;
@@ -131,6 +138,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     // commands
     let command_keys = {
         let mut ks = cfg.on_commands.keys().collect::<Vec<_>>();
+        ks.sort();
         ks.dedup();
         ks.into_lua()
     };
@@ -138,6 +146,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     let mut command_keys_file = create_or_open_file(command_keys_path)?;
     write!(command_keys_file, "return {}", command_keys)?;
     for (cmd, mut ps) in cfg.on_commands {
+        ps.sort();
         ps.dedup();
         let command_path = [root, constant::dir::COMMANDS, cmd.as_ref()].join("/");
         let mut command_file = create_or_open_file(command_path)?;
@@ -146,6 +155,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
 
     // filetypes
     for (ft, mut ps) in cfg.on_filetypes {
+        ps.sort();
         ps.dedup();
         let ft_plugin_path = [
             root,
@@ -172,6 +182,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     // startup
     let startup_config_keys = {
         let mut ps = cfg.startup_config_plugins;
+        ps.sort();
         ps.dedup();
         ps.into_lua()
     };
@@ -182,6 +193,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
     // denops
     let denops_keys = {
         let mut cs = cfg.denops_clients;
+        cs.sort();
         cs.dedup();
         cs.into_iter()
             .fold(HashMap::new(), |mut acc, k| {
@@ -196,6 +208,7 @@ fn export_load_config(root: &str, cfg: LoadConfig) -> Result<()> {
 
     // rtp
     for (id, mut paths) in cfg.rtp {
+        paths.sort();
         paths.dedup();
         let rtp_path = [root, constant::dir::RTP, id.to_string().as_ref()].join("/");
         let mut rtp_file = create_or_open_file(rtp_path)?;
