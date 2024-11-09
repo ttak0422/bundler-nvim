@@ -70,7 +70,7 @@
 						log.error(name, "failed to denops plugin load.")
 					end
 				end
-				vim.fn["denops#plugin#wait"](name)
+				vim.fn["denops#plugin#wait"](name, { silent = 1 })
 			end
 		end
 	end
